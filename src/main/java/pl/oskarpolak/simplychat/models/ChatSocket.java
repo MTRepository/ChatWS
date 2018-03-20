@@ -10,6 +10,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 import org.springframework.web.socket.handler.BinaryWebSocketHandler;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,22 +27,24 @@ public class ChatSocket extends TextWebSocketHandler implements WebSocketConfigu
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        for (WebSocketSession webSocketSession : sessionList) {
-            webSocketSession.sendMessage(new TextMessage("log:"+message.getPayload()));
-        }
+        sendMessageToAll("log:" + message.getPayload());
     }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         sessionList.add(session);
 
-        for (WebSocketSession webSocketSession : sessionList) {
-            webSocketSession.sendMessage(new TextMessage("connected:Ktoś sie polaczyl"));
-        }
+        sendMessageToAll("connected:" + sessionList.size());
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         sessionList.remove(session);
+    }
+
+    private void sendMessageToAll(String message) throws IOException {
+        for (WebSocketSession webSocketSession : sessionList) {
+            webSocketSession.sendMessage(new TextMessage(message));
+        }
     }
 }
