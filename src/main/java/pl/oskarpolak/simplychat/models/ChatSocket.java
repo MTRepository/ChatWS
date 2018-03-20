@@ -30,7 +30,15 @@ public class ChatSocket extends TextWebSocketHandler implements WebSocketConfigu
         UserModel userModel = findUserBySessionId(session.getId());
         String messageString = message.getPayload();
 
+        if(messageString.trim().isEmpty()){
+            return;
+        }
+
         if(userModel.getUsername() == null){
+            if(isNickBusy(messageString)){
+                userModel.sendMessage("server:Nick jest zajęty, podaj inny");
+                return;
+            }
             userModel.setUsername(messageString);
             userModel.sendMessage("server:Ustawiłem nick");
             return;
@@ -68,5 +76,9 @@ public class ChatSocket extends TextWebSocketHandler implements WebSocketConfigu
                 .filter(s -> s.getSession().getId().equals(sessionId))
                 .findAny()
                 .orElseThrow(IllegalStateException::new);
+    }
+
+    private boolean isNickBusy(String nickname){
+        return sessionList.stream().anyMatch(s -> s != null && s.getUsername().equals(nickname));
     }
 }
