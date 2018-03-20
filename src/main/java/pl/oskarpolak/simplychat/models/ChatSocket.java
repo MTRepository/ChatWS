@@ -15,6 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @EnableWebSocket
 @Component
@@ -55,7 +56,29 @@ public class ChatSocket extends TextWebSocketHandler implements WebSocketConfigu
         }
 
 
+        if(messageString.startsWith("/kick")){
+            kickCommand(userModel, messageString);
+            return;
+        }
+
+
         sendMessageToAll("log:" + userModel.getUsername() + "<" + getTime() + ">: " + message.getPayload() + "  (" + userModel.getSession().getRemoteAddress().getAddress().getHostAddress()+")");
+    }
+
+    private void kickCommand(UserModel userModel, String messageString) throws IOException {
+        String data[] = messageString.split(" ");
+        if(data.length < 2){
+            userModel.sendMessage("Za mało argumentów");
+            return;
+        }
+        Optional<UserModel> userToKick = findUserByUsername(data[1]);
+        if(!userToKick.isPresent()){
+            userModel.sendMessage("Taki user nie istnieje!");
+            return;
+        }
+
+        userToKick.get().sendMessage("Zostałeś wyrzucony!");
+        userToKick.get().getSession().close();
     }
 
     private String getTime(){
@@ -94,6 +117,13 @@ public class ChatSocket extends TextWebSocketHandler implements WebSocketConfigu
                 .findAny()
                 .orElseThrow(IllegalStateException::new);
     }
+
+    private Optional<UserModel> findUserByUsername(String username){
+        return sessionList.stream()
+                .filter(s -> s.getUsername().equals(username))
+                .findAny();
+    }
+
 
     private boolean isNickBusy(String nickname){
         return sessionList.stream().anyMatch(s -> s.getUsername() != null && s.getUsername().equals(nickname));

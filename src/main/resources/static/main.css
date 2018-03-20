@@ -1,13 +1,17 @@
-#chat { width: 97%; }
+#chat {
+    width: 100%;
+    height: 50px;
+    font-size: 30px
+}
 .message { font-weight: normal}
-.message:before { content: ' '; color: #bbb; font-size: 10px; }
+.message:before { content: ' '; color: #bbb; font-size: 35px; }
 
-.server { font-weight: bold; color: #d75d22;}
-.server:before { content: ' '; color: #d75d22; font-size: 12px; }
+.server { font-weight: bold; color: #d70012;}
+.server:before { content: ' '; color: #d70411; font-size: 40px; }
 
 #log {
     overflow: auto;
-    max-height: 100px;
+    max-height: 150px;
     list-style: none;
     padding: 0;
 }
@@ -18,7 +22,7 @@
 }
 
 body {
-    font: normal 13px/20px "Helvetica Neue", Helvetica, sans-serif;
+    font: normal 26px/35px "Helvetica Neue", Helvetica, sans-serif;
     background: rgb(237, 237, 236);
     margin: 0;
     margin-top: 40px;
@@ -30,7 +34,7 @@ section, header {
 }
 
 #wrapper {
-    width: 600px;
+    width: 90%;
     margin: 0 auto;
     background: #fff;
     border-radius: 10px;
