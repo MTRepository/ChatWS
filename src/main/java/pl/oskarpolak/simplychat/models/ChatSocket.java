@@ -34,6 +34,7 @@ public class ChatSocket extends TextWebSocketHandler implements WebSocketConfigu
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         sessionList.add(session);
 
+        session.sendMessage(new TextMessage("server:Witaj na naszym chacie!"));
         sendMessageToAll("connected:" + sessionList.size());
     }
 

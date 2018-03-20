@@ -29,6 +29,10 @@ function onMessage(evt) {
     }else if (message.startsWith("connected:")) {
         message = message.slice("connected:".length);
         connected.innerHTML = message;
+    }else if(message.startsWith("server:")){
+        message = message.slice("server:".length);
+        log.innerHTML = log.innerHTML + "<li class = \"server\">" + message + "</li>";
+        log.scrollTop = log.scrollHeight;
     }
 }
 
