@@ -59,7 +59,7 @@ public class ChatSocket extends TextWebSocketHandler implements WebSocketConfigu
 
     private void sendMessageToAll(String message) throws IOException {
         for (UserModel userModel : sessionList) {
-            userModel.sendMessage("log:"+message);
+            userModel.sendMessage(message);
         }
     }
 
