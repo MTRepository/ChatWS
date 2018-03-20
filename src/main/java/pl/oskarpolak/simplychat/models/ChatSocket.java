@@ -33,17 +33,19 @@ public class ChatSocket extends TextWebSocketHandler implements WebSocketConfigu
         if(userModel.getUsername() == null){
             userModel.setUsername(messageString);
             userModel.sendMessage("server:Ustawiłem nick");
+            return;
         }
 
-        sendMessageToAll("log:" + message.getPayload());
+        sendMessageToAll("log:" + userModel.getUsername() + ": " + message.getPayload());
     }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        sessionList.add(new UserModel(session));
+        UserModel userModel = new UserModel(session);
+        sessionList.add(userModel);
 
-        session.sendMessage(new TextMessage("server:Witaj na naszym chacie!"));
-        session.sendMessage(new TextMessage("server:Twoja pierwsza wiadomość, zostanie Twoim nickiem"));
+        userModel.sendMessage("server:Witaj na naszym chacie!");
+        userModel.sendMessage("server:Twoja pierwsza wiadomość, zostanie Twoim nickiem");
 
         sendMessageToAll("connected:" + sessionList.size());
     }
@@ -57,7 +59,7 @@ public class ChatSocket extends TextWebSocketHandler implements WebSocketConfigu
 
     private void sendMessageToAll(String message) throws IOException {
         for (UserModel userModel : sessionList) {
-            userModel.getSession().sendMessage(new TextMessage(message));
+            userModel.sendMessage("log:"+message);
         }
     }
 
