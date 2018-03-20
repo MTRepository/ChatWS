@@ -13,19 +13,17 @@
 <section id = "wrapper">
 
     <header>
-        <h1>HTML5 Chat</h1>
+        <!--<h3>HTML5 Chat</h3>-->
     </header>
 
 
     <article>
-
+        <ul id = "log"></ul>
         <form onsubmit = "addMessage(); return false;">
-            <input type = "text" id = "chat" placeholder = "type and press enter to chat" />
+            <input type = "text" id = "chat" placeholder = "Wpisz wiadomość" />
         </form>
 
-        <p id = "status">Not connected</p>
-        <p>Users connected: <span id = "connected">0</span></p>
-        <ul id = "log"></ul>
+        <p>Podłączonych: <span id = "connected">0</span></p>
 
     </article>
 </section>

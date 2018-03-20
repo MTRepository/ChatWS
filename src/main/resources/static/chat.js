@@ -1,6 +1,6 @@
 
 function onLoad() {
-    var wsUri = "ws://localhost:8080/chat";
+    var wsUri = "ws://192.168.1.229:8080/chat";
     websocket = new WebSocket(wsUri);
     websocket.onopen = function(evt) { onOpen(evt) };
     websocket.onclose = function(evt) { onClose(evt) };
@@ -20,15 +20,12 @@ function onClose(evt) {
 }
 
 function onMessage(evt) {
-    // There are two types of messages:
-    // 1. a chat participant message itself
-    // 2. a message with a number of connected chat participants
     var message = evt.data;
 
     if (message.startsWith("log:")) {
         message = message.slice("log:".length);
-        log.innerHTML = '<li class = "message">' +
-            message + "</li>" + log.innerHTML;
+        log.innerHTML = log.innerHTML + "<li class = \"message\">" + message + "</li>";
+        log.scrollTop = log.scrollHeight;
     }else if (message.startsWith("connected:")) {
         message = message.slice("connected:".length);
         connected.innerHTML = message;
