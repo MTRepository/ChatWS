@@ -11,6 +11,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +54,12 @@ public class ChatSocket extends TextWebSocketHandler implements WebSocketConfigu
             return;
         }
 
-        sendMessageToAll("log:" + userModel.getUsername() + ": " + message.getPayload());
+
+        sendMessageToAll("log:" + userModel.getUsername() + "<" + getTime() + ">: " + message.getPayload() + "(" + userModel.getSession().getRemoteAddress().getHostName()+")");
+    }
+
+    private String getTime(){
+        return DateTimeFormatter.ofPattern("HH:mm:ss").format(LocalTime.now());
     }
 
     @Override
