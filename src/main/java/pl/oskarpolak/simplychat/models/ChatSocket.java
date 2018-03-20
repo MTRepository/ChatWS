@@ -79,6 +79,6 @@ public class ChatSocket extends TextWebSocketHandler implements WebSocketConfigu
     }
 
     private boolean isNickBusy(String nickname){
-        return sessionList.stream().anyMatch(s -> s != null && s.getUsername().equals(nickname));
+        return sessionList.stream().anyMatch(s -> s.getUsername() != null && s.getUsername().equals(nickname));
     }
 }
