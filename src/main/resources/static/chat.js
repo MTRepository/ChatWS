@@ -1,6 +1,6 @@
 
 function onLoad() {
-    var wsUri = "ws://akademiachat.herokuapp.com//chat";
+    var wsUri = "ws://akademiachat.herokuapp.com/chat";
     websocket = new WebSocket(wsUri);
     websocket.onopen = function(evt) { onOpen(evt) };
     websocket.onclose = function(evt) { onClose(evt) };
