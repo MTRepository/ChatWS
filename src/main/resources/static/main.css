@@ -2,7 +2,7 @@
 .message { font-weight: normal}
 .message:before { content: ' '; color: #bbb; font-size: 10px; }
 
-.server { font-weight: bold}
+.server { font-weight: bold; color: #d75d22;}
 .server:before { content: ' '; color: #d75d22; font-size: 12px; }
 
 #log {

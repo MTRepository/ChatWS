@@ -18,7 +18,7 @@ import java.util.List;
 @Component
 public class ChatSocket extends TextWebSocketHandler implements WebSocketConfigurer {
 
-    private List<WebSocketSession> sessionList = new ArrayList<>();
+    private List<UserModel> sessionList = new ArrayList<>();
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry webSocketHandlerRegistry) {
@@ -27,26 +27,44 @@ public class ChatSocket extends TextWebSocketHandler implements WebSocketConfigu
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        UserModel userModel = findUserBySessionId(session.getId());
+        String messageString = message.getPayload();
+
+        if(userModel.getUsername() == null){
+            userModel.setUsername(messageString);
+            userModel.sendMessage("server:Ustawiłem nick");
+        }
+
         sendMessageToAll("log:" + message.getPayload());
     }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        sessionList.add(session);
+        sessionList.add(new UserModel(session));
 
         session.sendMessage(new TextMessage("server:Witaj na naszym chacie!"));
+        session.sendMessage(new TextMessage("server:Twoja pierwsza wiadomość, zostanie Twoim nickiem"));
+
         sendMessageToAll("connected:" + sessionList.size());
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        sessionList.remove(session);
+        sessionList.remove(findUserBySessionId(session.getId()));
+
         sendMessageToAll("connected:" + sessionList.size());
     }
 
     private void sendMessageToAll(String message) throws IOException {
-        for (WebSocketSession webSocketSession : sessionList) {
-            webSocketSession.sendMessage(new TextMessage(message));
+        for (UserModel userModel : sessionList) {
+            userModel.getSession().sendMessage(new TextMessage(message));
         }
+    }
+
+    private UserModel findUserBySessionId(String sessionId){
+        return sessionList.stream()
+                .filter(s -> s.getSession().getId().equals(sessionId))
+                .findAny()
+                .orElseThrow(IllegalStateException::new);
     }
 }
