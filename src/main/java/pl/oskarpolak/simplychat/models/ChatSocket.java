@@ -40,6 +40,7 @@ public class ChatSocket extends TextWebSocketHandler implements WebSocketConfigu
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         sessionList.remove(session);
+        sendMessageToAll("connected:" + sessionList.size());
     }
 
     private void sendMessageToAll(String message) throws IOException {
