@@ -7,10 +7,11 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
-import org.springframework.web.socket.handler.BinaryWebSocketHandler;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +20,7 @@ import java.util.List;
 public class ChatSocket extends TextWebSocketHandler implements WebSocketConfigurer {
 
     private List<UserModel> sessionList = new ArrayList<>();
+
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry webSocketHandlerRegistry) {
@@ -29,6 +31,13 @@ public class ChatSocket extends TextWebSocketHandler implements WebSocketConfigu
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         UserModel userModel = findUserBySessionId(session.getId());
         String messageString = message.getPayload();
+
+        userPostMessage(userModel);
+        if(isUserBanned(userModel)){
+            userModel.sendMessage("server:Jestes zbanowany ");
+            userModel.sendMessage("server: Jeszcze: " + (userModel.getBanTime().until(LocalTime.now(), ChronoUnit.SECONDS)) + "s.");
+            return;
+        }
 
         if(messageString.trim().isEmpty()){
             return;
@@ -51,6 +60,8 @@ public class ChatSocket extends TextWebSocketHandler implements WebSocketConfigu
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         UserModel userModel = new UserModel(session);
         sessionList.add(userModel);
+
+
 
         userModel.sendMessage("server:Witaj na naszym chacie!");
         userModel.sendMessage("server:Twoja pierwsza wiadomość, zostanie Twoim nickiem");
@@ -80,5 +91,33 @@ public class ChatSocket extends TextWebSocketHandler implements WebSocketConfigu
 
     private boolean isNickBusy(String nickname){
         return sessionList.stream().anyMatch(s -> s.getUsername() != null && s.getUsername().equals(nickname));
+    }
+
+    private void userPostMessage(UserModel userModel){
+        if(userModel.getBanTime() != null){
+            return;
+        }
+
+        if(Math.abs(userModel.getLastWriteMinute().until(LocalTime.now(), ChronoUnit.MINUTES)) > 1){
+            userModel.setLastWriteMinute(LocalTime.now());
+            userModel.setMessageCounterInLastMinute(0);
+        }else {
+            userModel.setMessageCounterInLastMinute(userModel.getMessageCounterInLastMinute() + 1);
+            if (userModel.getMessageCounterInLastMinute() >= 30) {
+                userModel.setBanTime(LocalTime.now().plusMinutes(1));
+                userModel.setMessageCounterInLastMinute(0);
+            }
+        }
+    }
+
+    private boolean isUserBanned(UserModel userModel){
+        if(userModel.getBanTime() != null ){
+            if(userModel.getBanTime().isAfter(LocalTime.now())){
+                return true;
+            }else{
+                userModel.setBanTime(null);
+            }
+        }
+        return false;
     }
 }
