@@ -1,6 +1,6 @@
 
 function onLoad() {
-    var wsUri = "ws://192.168.1.229:8080/chat";
+    var wsUri = "ws://localhost:8080/chat";
     websocket = new WebSocket(wsUri);
     websocket.onopen = function(evt) { onOpen(evt) };
     websocket.onclose = function(evt) { onClose(evt) };
