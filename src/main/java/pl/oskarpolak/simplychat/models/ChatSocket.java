@@ -55,7 +55,7 @@ public class ChatSocket extends TextWebSocketHandler implements WebSocketConfigu
         }
 
 
-        sendMessageToAll("log:" + userModel.getUsername() + "<" + getTime() + ">: " + message.getPayload() + "(" + userModel.getSession().getRemoteAddress().getHostName()+")");
+        sendMessageToAll("log:" + userModel.getUsername() + "<" + getTime() + ">: " + message.getPayload() + "  (" + userModel.getSession().getRemoteAddress().getAddress().getHostAddress()+")");
     }
 
     private String getTime(){
